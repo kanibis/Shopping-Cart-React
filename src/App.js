@@ -1,24 +1,39 @@
-import logo from './logo.svg';
+import {useEffect, useReducer} from 'react'
+import axios from 'axios'
 import './App.css';
+import Products from './components/Products';
+import Cart from './components/Cart';
+import { cartReducer } from './reducers/cartReducer';
+import { Header } from './components/Header';
 
 function App() {
+  const [state, dispatch] = useReducer(cartReducer, {
+    products: [],
+    cart: [],
+  });
+
+  console.log(state)
+
+  const fetchProducts = async()=>{
+    const {data} = await axios.get("https://dummyjson.com/products")
+    dispatch({
+      type: 'ADD_PRODUCTS',
+      payload: data.products
+    })
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header/>
+      <div className="app">
+        <Products state={state} dispatch={dispatch}/>
+        <Cart state={state} dispatch={dispatch}/>
+      </div>
+    </>
   );
 }
 
